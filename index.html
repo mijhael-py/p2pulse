@@ -38,8 +38,6 @@
 		<script defer src="webrtc.js"></script>
 		<title>P2Pulse | Videconferencia P2P</title>
 
-		<!-- ANALYTICS_SCRIPT: Please remove it for your use -->
-		<script async defer src="https://scripts.withcabin.com/hello.js"></script>
 	</head>
 
 	<body>
@@ -53,23 +51,23 @@
 					<p>Videoconferencias gratuitas, peer-to-peer, seguras y en alta calidad.</p>
 					<p>
 						<label for="roomId">Room Id:</label>
-						<input type="text" id="roomId" v-model="roomId" placeholder="Enter a room id" />
+						<input type="text" id="roomId" v-model="roomId" placeholder="Ingresa o genera un ID" />
 					</p>
 					<p>
 						<label for="yourName">Nombre:</label>
-						<input type="text" id="yourName" v-model="name" v-on:keyup="updateName" placeholder="Enter your name" />
+						<input type="text" id="yourName" v-model="name" v-on:keyup="updateName" placeholder="Escribe tu nombre" />
 					</p>
 					<br />
 
 					<div class="footer">
-						<iframe
+						<!-- <iframe
 							src="https://ghbtns.com/github-btn.html?user=vasanthv&repo=talk&type=star&count=true&size=large"
 							frameborder="0"
 							scrolling="0"
 							width="170"
 							height="30"
 							title="GitHub"
-						></iframe>
+						></iframe> -->
 
 						<button v-on:click="initiateCall">Ingresar</button>
 					</div>
