@@ -30,7 +30,7 @@ const App = Vue.createApp({
 			screenShareEnabled: false,
 			showChat: false,
 			showSettings: false,
-			hideToolbar: true,
+			hideToolbar: false,
 			selectedAudioDeviceId: "",
 			selectedVideoDeviceId: "",
 			name: window.localStorage.name,
