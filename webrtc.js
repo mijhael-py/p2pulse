@@ -4,7 +4,7 @@
 
 const ICE_SERVERS = [
 	{ urls: "stun:stun.l.google.com:19302" },
-	{ urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
+	{ urls: "turn:p2pulse.metered.live:443", username: "c041aebdea6f02f11a60f7e0", credential: "uJhKjEdwE+xaY90D" },
 ];
 
 const APP_URL = (() => {
