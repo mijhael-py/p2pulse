@@ -36,7 +36,7 @@
 		<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 		<script defer src="script.js"></script>
 		<script defer src="webrtc.js"></script>
-		<title>Talk - Free video calling for the web</title>
+		<title>P2Pulse | Videconferencia P2P</title>
 
 		<!-- ANALYTICS_SCRIPT: Please remove it for your use -->
 		<script async defer src="https://scripts.withcabin.com/hello.js"></script>
@@ -49,14 +49,14 @@
 		<main id="app">
 			<div id="appWrap" v-bind:style="'display:block;'">
 				<div id="intro" v-if="!callInitiated && !showChat && !showSettings">
-					<h1>Talk</h1>
-					<p>A free, peer-to-peer, encrypted, open-source video calling for the web.</p>
+					<h1>P2Pulse</h1>
+					<p>Videoconferencias gratuitas, peer-to-peer, seguras y en alta calidad.</p>
 					<p>
 						<label for="roomId">Room Id:</label>
 						<input type="text" id="roomId" v-model="roomId" placeholder="Enter a room id" />
 					</p>
 					<p>
-						<label for="yourName">Your name</label>
+						<label for="yourName">Nombre:</label>
 						<input type="text" id="yourName" v-model="name" v-on:keyup="updateName" placeholder="Enter your name" />
 					</p>
 					<br />
@@ -71,11 +71,11 @@
 							title="GitHub"
 						></iframe>
 
-						<button v-on:click="initiateCall">Proceed</button>
+						<button v-on:click="initiateCall">Ingresar</button>
 					</div>
 				</div>
 
-				<div id="callFeedbackWrap" v-if="callEnded">
+				<!-- <div id="callFeedbackWrap" v-if="callEnded">
 					<div id="callFeedback">
 						<div class="bold">Your call has been disconnected. You can now close this window.</div>
 						<br />
@@ -87,10 +87,10 @@
 								<button data-cabin-event="call-quality-nah" v-on:click="onCallFeedback">😟<br />Nah!</button>
 								<button data-cabin-event="call-quality-meh" v-on:click="onCallFeedback">😐<br />Meh!</button>
 								<button data-cabin-event="call-quality-yay" v-on:click="onCallFeedback">😀<br />Yay!</button>
-							</div>
+							</div> 
 						</div>
 					</div>
-				</div>
+				</div> -->
 
 				<div id="chatWrap" v-if="showChat">
 					<div id="chats" ref="chatContainer">
