@@ -72,35 +72,34 @@ const App = Vue.createApp({
 		},*/
 
 		videoToggle(e) {
-    e.stopPropagation();
-    
-    // Obtén la pista de video
-    const videoTrack = localMediaStream.getVideoTracks()[0];
-    
-    if (videoTrack) {
-        if (videoTrack.enabled) {
-            // Si la cámara está activa, detenla completamente
-            videoTrack.stop();  // Esto apagará el LED de la cámara
-            this.videoEnabled = false;
-        } else {
-            // Reactiva la cámara si estaba detenida
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    // Asigna el nuevo stream de video
-                    localMediaStream = stream;
-                    this.videoEnabled = true;
-                })
-                .catch(error => {
-                    console.error("Error al acceder a la cámara: ", error);
-                });
-        }
+        e.stopPropagation();
+
+        // Obtén la pista de video
+        const videoTrack = this.localMediaStream.getVideoTracks()[0];
         
-        // Actualiza el estado del usuario
-        this.updateUserData("videoEnabled", this.videoEnabled);
-    } else {
-        console.error("No se pudo acceder a la pista de video.");
-    }
-},
+        if (videoTrack) {
+            if (videoTrack.readyState === "live") {
+                // Si está activa, detenemos la pista de video
+                videoTrack.stop(); // Apaga el LED de la cámara
+                this.videoEnabled = false;
+            } else {
+                // Reactivamos la cámara solicitando de nuevo acceso al video
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        this.localMediaStream = stream;
+                        this.videoEnabled = true;
+                    })
+                    .catch(error => {
+                        console.error("Error al acceder a la cámara: ", error);
+                    });
+            }
+
+            // Actualiza el estado del video
+            this.updateUserData("videoEnabled", this.videoEnabled);
+        } else {
+            console.error("No se pudo acceder a la pista de video.");
+        }
+    },
 		
 		toggleSelfVideoMirror() {
 			document.querySelector("#videos .video #selfVideo").classList.toggle("mirror");
