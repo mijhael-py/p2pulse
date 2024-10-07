@@ -71,20 +71,21 @@ const App = Vue.createApp({
 			this.updateUserData("videoEnabled", this.videoEnabled);
 		},*/
 
-		videoToggle(e) {
+videoToggle(e) {
     e.stopPropagation();
 
     // Verificar si el localMediaStream está definido
     if (!this.localMediaStream || this.localMediaStream.getVideoTracks().length === 0) {
         // Si no hay un stream de video, obtenemos uno nuevo
         console.log("No se encontró un stream de video activo, solicitando acceso a la cámara...");
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true }) // Asegúrate de solicitar audio también
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
             .then(stream => {
                 this.localMediaStream = stream;
                 this.videoEnabled = true;
                 console.log("Stream de video activado.");
                 this.updateUserData("videoEnabled", this.videoEnabled);
                 // Actualiza la interfaz aquí si es necesario
+                attachMediaStream(document.getElementById("selfVideo"), this.localMediaStream); // Asegúrate de mostrar el video
             })
             .catch(error => {
                 console.error("Error al acceder a la cámara:", error);
@@ -103,12 +104,13 @@ const App = Vue.createApp({
             console.log("Cámara detenida.");
         } else {
             // Reactivar la cámara
-            navigator.mediaDevices.getUserMedia({ video: true }) // Asegúrate de solicitar audio también
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
                 .then(stream => {
-                    const newAudioTrack = this.localMediaStream.getAudioTracks()[0]; // Mantén la pista de audio existente
+                    const newAudioTrack = this.localMediaStream.getAudioTracks()[0]; // Mantener la pista de audio existente
                     this.localMediaStream = new MediaStream([stream.getVideoTracks()[0], newAudioTrack]); // Crear un nuevo stream con el video y el audio existente
                     this.videoEnabled = true;
                     console.log("Cámara reactivada.");
+                    attachMediaStream(document.getElementById("selfVideo"), this.localMediaStream); // Asegúrate de mostrar el video
                 })
                 .catch(error => {
                     console.error("Error al acceder a la cámara:", error);
@@ -119,8 +121,7 @@ const App = Vue.createApp({
     // Actualizar el estado del video
     this.updateUserData("videoEnabled", this.videoEnabled);
 },
-
-		
+	
 		toggleSelfVideoMirror() {
 			document.querySelector("#videos .video #selfVideo").classList.toggle("mirror");
 		},
