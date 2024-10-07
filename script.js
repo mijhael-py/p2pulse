@@ -72,7 +72,7 @@ const App = Vue.createApp({
 			this.updateUserData("videoEnabled", this.videoEnabled);
 		},*/
 
-		audioToggle(e) {
+audioToggle(e) {
     e.stopPropagation();
 
     const audioTrack = localMediaStream.getAudioTracks()[0];
@@ -84,20 +84,21 @@ const App = Vue.createApp({
     } else {
         // Volver a encender el micrófono solicitando un nuevo stream
         navigator.mediaDevices
-            .getUserMedia({ audio: true })
+            .getUserMedia({ audio: true })  // Solicitamos acceso al micrófono de nuevo
             .then((stream) => {
                 const newAudioTrack = stream.getAudioTracks()[0];
-                localMediaStream.removeTrack(audioTrack);
-                localMediaStream.addTrack(newAudioTrack);
+                localMediaStream.removeTrack(audioTrack);  // Quitamos la pista anterior de audio
+                localMediaStream.addTrack(newAudioTrack);  // Añadimos la nueva pista de audio
                 this.audioEnabled = true;
                 this.updateUserData("audioEnabled", this.audioEnabled);
 
-                // Reemplazar el track en las conexiones existentes
+                // Reemplazamos la pista de audio en las conexiones WebRTC activas
                 for (let peer_id in peers) {
                     const sender = peers[peer_id].getSenders().find(s => s.track && s.track.kind === 'audio');
                     if (sender) sender.replaceTrack(newAudioTrack);
                 }
 
+                // Actualizamos el audio local en la interfaz
                 attachMediaStream(document.getElementById("selfVideo"), localMediaStream);
             })
             .catch(err => console.error('Error al encender el micrófono', err));
@@ -105,7 +106,8 @@ const App = Vue.createApp({
 
     this.updateUserData("audioEnabled", this.audioEnabled);
 },
-
+ 
+		
 videoToggle(e) {
     e.stopPropagation();
 
@@ -118,20 +120,21 @@ videoToggle(e) {
     } else {
         // Volver a encender la cámara solicitando un nuevo stream
         navigator.mediaDevices
-            .getUserMedia({ video: true })
+            .getUserMedia({ video: true })  // Volvemos a solicitar acceso a la cámara
             .then((stream) => {
                 const newVideoTrack = stream.getVideoTracks()[0];
-                localMediaStream.removeTrack(videoTrack);
-                localMediaStream.addTrack(newVideoTrack);
+                localMediaStream.removeTrack(videoTrack);  // Quitamos el video anterior
+                localMediaStream.addTrack(newVideoTrack);  // Añadimos la nueva pista de video
                 this.videoEnabled = true;
                 this.updateUserData("videoEnabled", this.videoEnabled);
 
-                // Reemplazar el track en las conexiones existentes
+                // Reemplazamos la pista de video en las conexiones WebRTC activas
                 for (let peer_id in peers) {
                     const sender = peers[peer_id].getSenders().find(s => s.track && s.track.kind === 'video');
                     if (sender) sender.replaceTrack(newVideoTrack);
                 }
 
+                // Actualizamos el video local en la interfaz
                 attachMediaStream(document.getElementById("selfVideo"), localMediaStream);
             })
             .catch(err => console.error('Error al encender la cámara', err));
@@ -139,7 +142,7 @@ videoToggle(e) {
 
     this.updateUserData("videoEnabled", this.videoEnabled);
 },
-	
+
 		toggleSelfVideoMirror() {
 			document.querySelector("#videos .video #selfVideo").classList.toggle("mirror");
 		},
