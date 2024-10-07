@@ -71,33 +71,43 @@ const App = Vue.createApp({
 			this.updateUserData("videoEnabled", this.videoEnabled);
 		},*/
 
-		videoToggle(e) {
-        e.stopPropagation();
+		 videoToggle(e) {
+        		e.stopPropagation();
 
-        // Obtén la pista de video
-        const videoTrack = this.localMediaStream.getVideoTracks()[0];
+       			 console.log('Estado actual de videoEnabled antes del toggle:', this.videoEnabled);
         
-        if (videoTrack) {
-            if (videoTrack.readyState === "live") {
-                // Si está activa, detenemos la pista de video
-                videoTrack.stop(); // Apaga el LED de la cámara
-                this.videoEnabled = false;
-            } else {
-                // Reactivamos la cámara solicitando de nuevo acceso al video
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(stream => {
-                        this.localMediaStream = stream;
-                        this.videoEnabled = true;
-                    })
-                    .catch(error => {
-                        console.error("Error al acceder a la cámara: ", error);
-                    });
+       		// Verificar si localMediaStream está disponible
+        		const videoTrack = this.localMediaStream ? this.localMediaStream.getVideoTracks()[0] : null;
+
+       			 if (videoTrack) {
+          		 if (videoTrack.readyState === "live") {
+                // Si la cámara está activa, detenla
+               			 videoTrack.stop();
+               			 console.log('Cámara detenida');
+               			 this.videoEnabled = false;
+           			 } else {
+                // Reactivar la cámara solicitando acceso al video
+               				 navigator.mediaDevices.getUserMedia({ video: true })
+                   			 .then(stream => {
+                       			  this.localMediaStream = stream;
+                       			  this.videoEnabled = true;
+
+                        			console.log('Cámara reactivada');
+                    									})
+                  								  .catch(error => {
+                      								  console.error("Error al acceder a la cámara:", error);
+                  									  });
             }
 
             // Actualiza el estado del video
             this.updateUserData("videoEnabled", this.videoEnabled);
         } else {
             console.error("No se pudo acceder a la pista de video.");
+        }
+
+        // Verificar el estado después de intentar detener o iniciar la cámara
+        if (videoTrack) {
+            console.log('Estado de la pista de video:', videoTrack.readyState);
         }
     },
 		
