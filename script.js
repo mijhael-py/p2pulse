@@ -71,18 +71,18 @@ const App = Vue.createApp({
 			this.updateUserData("videoEnabled", this.videoEnabled);
 		},*/
 
-		 videoToggle(e) {
+		videoToggle(e) {
     e.stopPropagation();
 
     // Verificar si el localMediaStream está definido
     if (!localMediaStream || localMediaStream.getVideoTracks().length === 0) {
-        // Si no hay un stream de video, obtenemos uno nuevo
         console.log("No se encontró un stream de video activo, solicitando acceso a la cámara...");
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
                 localMediaStream = stream; // Asignar el stream a la variable global
                 this.videoEnabled = true;
                 console.log("Stream de video activado.");
+                attachMediaStream(document.getElementById("selfVideo"), localMediaStream); // Mostrar en la interfaz
                 this.updateUserData("videoEnabled", this.videoEnabled);
             })
             .catch(error => {
@@ -98,10 +98,9 @@ const App = Vue.createApp({
         if (videoTrack.readyState === "live") {
             // Detener la pista de video
             videoTrack.stop(); // Detener la pista
+            localMediaStream.removeTrack(videoTrack); // Eliminar la pista del stream
             this.videoEnabled = false; // Cambiar el estado
             console.log("Cámara detenida.");
-            // Liberar el stream
-            localMediaStream.removeTrack(videoTrack);
             this.updateUserData("videoEnabled", this.videoEnabled);
         } else {
             // Reactivar la cámara
@@ -109,6 +108,7 @@ const App = Vue.createApp({
                 .then(stream => {
                     const newVideoTrack = stream.getVideoTracks()[0];
                     localMediaStream.addTrack(newVideoTrack); // Agregar la nueva pista al stream
+                    attachMediaStream(document.getElementById("selfVideo"), localMediaStream); // Mostrar en la interfaz
                     this.videoEnabled = true;
                     console.log("Cámara reactivada.");
                     this.updateUserData("videoEnabled", this.videoEnabled);
@@ -119,6 +119,7 @@ const App = Vue.createApp({
         }
     }
 },
+
 		
 		toggleSelfVideoMirror() {
 			document.querySelector("#videos .video #selfVideo").classList.toggle("mirror");
