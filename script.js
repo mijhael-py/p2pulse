@@ -58,7 +58,7 @@ const App = Vue.createApp({
 				(err) => console.error(err)
 			);
 		},
-		audioToggle(e) {
+		/*audioToggle(e) {
 			e.stopPropagation();
 			localMediaStream.getAudioTracks()[0].enabled = !localMediaStream.getAudioTracks()[0].enabled;
 			this.audioEnabled = !this.audioEnabled;
@@ -70,7 +70,41 @@ const App = Vue.createApp({
 			localMediaStream.getVideoTracks()[0].enabled = !localMediaStream.getVideoTracks()[0].enabled;
 			this.videoEnabled = !this.videoEnabled;
 			this.updateUserData("videoEnabled", this.videoEnabled);
-		},
+		},*/
+
+		audioToggle(e) {
+    e.stopPropagation();
+
+    const audioTrack = localMediaStream.getAudioTracks()[0];
+
+    if (audioTrack.enabled) {
+        // Apagar físicamente el micrófono
+        audioTrack.stop();
+        this.audioEnabled = false;
+    } else {
+        // Volver a encender el micrófono solicitando un nuevo stream
+        navigator.mediaDevices
+            .getUserMedia({ audio: true })
+            .then((stream) => {
+                const newAudioTrack = stream.getAudioTracks()[0];
+                localMediaStream.removeTrack(audioTrack);
+                localMediaStream.addTrack(newAudioTrack);
+                this.audioEnabled = true;
+                this.updateUserData("audioEnabled", this.audioEnabled);
+
+                // Reemplazar el track en las conexiones existentes
+                for (let peer_id in peers) {
+                    const sender = peers[peer_id].getSenders().find(s => s.track && s.track.kind === 'audio');
+                    if (sender) sender.replaceTrack(newAudioTrack);
+                }
+
+                attachMediaStream(document.getElementById("selfVideo"), localMediaStream);
+            })
+            .catch(err => console.error('Error al encender el micrófono', err));
+    }
+
+    this.updateUserData("audioEnabled", this.audioEnabled);
+}
 	
 		toggleSelfVideoMirror() {
 			document.querySelector("#videos .video #selfVideo").classList.toggle("mirror");
