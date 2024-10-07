@@ -104,7 +104,41 @@ const App = Vue.createApp({
     }
 
     this.updateUserData("audioEnabled", this.audioEnabled);
-}
+},
+
+videoToggle(e) {
+    e.stopPropagation();
+
+    const videoTrack = localMediaStream.getVideoTracks()[0];
+
+    if (videoTrack.enabled) {
+        // Apagar físicamente la cámara
+        videoTrack.stop();
+        this.videoEnabled = false;
+    } else {
+        // Volver a encender la cámara solicitando un nuevo stream
+        navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then((stream) => {
+                const newVideoTrack = stream.getVideoTracks()[0];
+                localMediaStream.removeTrack(videoTrack);
+                localMediaStream.addTrack(newVideoTrack);
+                this.videoEnabled = true;
+                this.updateUserData("videoEnabled", this.videoEnabled);
+
+                // Reemplazar el track en las conexiones existentes
+                for (let peer_id in peers) {
+                    const sender = peers[peer_id].getSenders().find(s => s.track && s.track.kind === 'video');
+                    if (sender) sender.replaceTrack(newVideoTrack);
+                }
+
+                attachMediaStream(document.getElementById("selfVideo"), localMediaStream);
+            })
+            .catch(err => console.error('Error al encender la cámara', err));
+    }
+
+    this.updateUserData("videoEnabled", this.videoEnabled);
+},
 	
 		toggleSelfVideoMirror() {
 			document.querySelector("#videos .video #selfVideo").classList.toggle("mirror");
