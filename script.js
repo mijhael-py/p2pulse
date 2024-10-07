@@ -72,51 +72,53 @@ const App = Vue.createApp({
 		},*/
 
 		 videoToggle(e) {
-        e.stopPropagation();
+    e.stopPropagation();
 
-        // Verificar si el localMediaStream está definido
-        if (!this.localMediaStream || this.localMediaStream.getVideoTracks().length === 0) {
-            // Si no hay un stream de video, obtenemos uno nuevo
-            console.log("No se encontró un stream de video activo, solicitando acceso a la cámara...");
+    // Verificar si el localMediaStream está definido
+    if (!localMediaStream || localMediaStream.getVideoTracks().length === 0) {
+        // Si no hay un stream de video, obtenemos uno nuevo
+        console.log("No se encontró un stream de video activo, solicitando acceso a la cámara...");
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                localMediaStream = stream; // Asignar el stream a la variable global
+                this.videoEnabled = true;
+                console.log("Stream de video activado.");
+                this.updateUserData("videoEnabled", this.videoEnabled);
+            })
+            .catch(error => {
+                console.error("Error al acceder a la cámara:", error);
+            });
+        return;
+    }
+
+    // Si ya existe una pista de video, la gestionamos (activar/desactivar)
+    const videoTrack = localMediaStream.getVideoTracks()[0];
+
+    if (videoTrack) {
+        if (videoTrack.readyState === "live") {
+            // Detener la pista de video
+            videoTrack.stop(); // Detener la pista
+            this.videoEnabled = false; // Cambiar el estado
+            console.log("Cámara detenida.");
+            // Liberar el stream
+            localMediaStream.removeTrack(videoTrack);
+            this.updateUserData("videoEnabled", this.videoEnabled);
+        } else {
+            // Reactivar la cámara
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
-                    this.localMediaStream = stream;
+                    const newVideoTrack = stream.getVideoTracks()[0];
+                    localMediaStream.addTrack(newVideoTrack); // Agregar la nueva pista al stream
                     this.videoEnabled = true;
-                    console.log("Stream de video activado.");
+                    console.log("Cámara reactivada.");
                     this.updateUserData("videoEnabled", this.videoEnabled);
                 })
                 .catch(error => {
                     console.error("Error al acceder a la cámara:", error);
                 });
-            return;
         }
-
-        // Si ya existe una pista de video, la gestionamos (activar/desactivar)
-        const videoTrack = this.localMediaStream.getVideoTracks()[0];
-
-        if (videoTrack) {
-            if (videoTrack.readyState === "live") {
-                // Detener la pista de video
-                videoTrack.stop();
-                this.videoEnabled = false;
-                console.log("Cámara detenida.");
-            } else {
-                // Reactivar la cámara
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(stream => {
-                        this.localMediaStream = stream;
-                        this.videoEnabled = true;
-                        console.log("Cámara reactivada.");
-                    })
-                    .catch(error => {
-                        console.error("Error al acceder a la cámara:", error);
-                    });
-            }
-        }
-
-        // Actualizar el estado del video
-        this.updateUserData("videoEnabled", this.videoEnabled);
-    },
+    }
+},
 		
 		toggleSelfVideoMirror() {
 			document.querySelector("#videos .video #selfVideo").classList.toggle("mirror");
